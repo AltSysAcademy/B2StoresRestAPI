@@ -77,8 +77,8 @@ def revoked_token_callback(jwt_header, jwt_payload):
 
 
 # Run the flask web app
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
 # JWT - Header, Payload (JTI, Sub, Times, Expiry), Signature
