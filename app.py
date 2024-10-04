@@ -59,6 +59,18 @@ api.register_blueprint(TagBlueprint)
 api.register_blueprint(UserBlueprint)
 
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_KEY")
+
+
+
+
+
+
+
+
+
+
+
+
 jwt = JWTManager(app)
 
 ## Checks if every JWT that goes inside our system/api is in the blocklist
