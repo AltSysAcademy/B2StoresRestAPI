@@ -5,6 +5,7 @@ from resources.tag import blp as TagBlueprint
 from resources.user import blp as UserBlueprint
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from blocklist import BLOCKLIST
 
 ## Import all models FOR THE SQLALCHEMY TO GENERATE TABLES 
@@ -24,6 +25,9 @@ load_dotenv()
 
 # Create a web server using flask
 app = Flask(__name__)
+
+# Enable cors
+CORS(app)
 
 # Setup the Blueprints and the API Documentation
 app.config["PROPAGATE_EXCEPTIONS"] = True
