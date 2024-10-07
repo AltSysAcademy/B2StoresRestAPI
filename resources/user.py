@@ -3,11 +3,45 @@ from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt, create_refresh_token
 
+import requests as r
 from db import db
 from blocklist import BLOCKLIST
 from models.user import UserModel
 from schemas import UserSchema
 from sqlalchemy.exc import SQLAlchemyError
+import os
+from dotenv import load_dotenv
+
+import jinja2
+
+load_dotenv()
+
+# DEFAULTS
+template_loader = jinja2.FileSystemLoader("templates")
+template_env = jinja2.Environment(loader=template_loader)
+
+def render_template(template_filename, **context):
+    return template_env.get_template(template_filename).render(**context)
+
+def send_email(to, subject, body, html):
+    # SEND EMAIL TO THE ONE WHO WILL REGISTER
+    mailgun_domain = os.getenv("MAILGUN_DOMAIN")
+    mailgun_api_key = os.getenv("MAILGUN_API_KEY")
+
+    a = r.post(
+  		f"https://api.mailgun.net/v3/{mailgun_domain}/messages",
+  		auth=("api", mailgun_api_key),
+  		data={
+            "from": f"Admins <mailgun@{mailgun_domain}>",
+  			"to": to,
+  			"subject": subject,
+  			"text": body,
+            "html": html
+        })
+
+    print(a.json())
+
+    return a
 
 blp = Blueprint("users", __name__, description="Operations on users endpoint.")
 
@@ -85,8 +119,20 @@ class UserRegister(MethodView):
 
         user = UserModel(
             username=user_req_body["username"], 
+            email=user_req_body["email"],
             password=pbkdf2_sha256.hash(user_req_body["password"])
         )
+        
+        html = render_template("action.html", hello=user.username, email=user.email)
+
+        # SEND AN EMAIL TO THE RECIPIENT
+        send_email(
+            to=user.email,
+            subject="Successfully Signed Up!",
+            body=f"Hi, {user.username}, You have successfully signed up to the Stores REST API.",
+            html=html
+        )
+
         try:
             db.session.add(user)
             db.session.commit()

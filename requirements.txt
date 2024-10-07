@@ -8,3 +8,5 @@ passlib
 flask-migrate
 gunicorn
 flask-cors
+requests
+urllib3
