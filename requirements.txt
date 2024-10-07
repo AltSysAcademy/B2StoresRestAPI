@@ -10,3 +10,4 @@ gunicorn
 flask-cors
 requests
 urllib3
+psycopg2
